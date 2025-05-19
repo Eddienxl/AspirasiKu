@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Pengguna> call, Response<Pengguna> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    isAdmin = "admin".equals(response.body().getPeran());
+                    isAdmin = "pengelola".equals(response.body().getPeran());
                     invalidateOptionsMenu(); // Refresh menu
                 }
             }
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         getMenuInflater().inflate(R.menu.menu_profile, menu);
-        menu.findItem(R.id.action_admin).setVisible(isAdmin); // Hanya tampilkan untuk admin
+        menu.findItem(R.id.action_admin).setVisible(isAdmin); // Hanya tampilkan untuk pengelola
         return true;
     }
 

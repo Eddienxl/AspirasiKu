@@ -60,8 +60,8 @@ public class UserAdminFragment extends Fragment {
                 } else {
                     // Data dummy jika API gagal
                     List<Pengguna> dummyUsers = new ArrayList<>();
-                    dummyUsers.add(new Pengguna(1, "User 1", "12345", "user1@example.com", "user"));
-                    dummyUsers.add(new Pengguna(2, "User 2", "67890", "user2@example.com", "user"));
+                    dummyUsers.add(new Pengguna(1, "User 1", "12345", "user1@example.com", "pengguna"));
+                    dummyUsers.add(new Pengguna(2, "User 2", "67890", "user2@example.com", "pengguna"));
                     adapter = new UserAdminAdapter(dummyUsers, userId -> {
                         dummyUsers.removeIf(user -> user.getId() == userId);
                         adapter.notifyDataSetChanged();
@@ -77,8 +77,8 @@ public class UserAdminFragment extends Fragment {
                 Log.e("ADMIN_USER", "onFailure: " + t.getMessage());
                 // Data dummy jika API gagal
                 List<Pengguna> dummyUsers = new ArrayList<>();
-                dummyUsers.add(new Pengguna(1, "User 1", "12345", "user1@example.com", "user"));
-                dummyUsers.add(new Pengguna(2, "User 2", "67890", "user2@example.com", "user"));
+                dummyUsers.add(new Pengguna(1, "User 1", "12345", "user1@example.com", "pengguna"));
+                dummyUsers.add(new Pengguna(2, "User 2", "67890", "user2@example.com", "pengguna"));
                 adapter = new UserAdminAdapter(dummyUsers, userId -> {
                     dummyUsers.removeIf(user -> user.getId() == userId);
                     adapter.notifyDataSetChanged();
