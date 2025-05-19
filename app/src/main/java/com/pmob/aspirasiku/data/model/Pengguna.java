@@ -7,6 +7,15 @@ public class Pengguna {
     private String email;
     private String peran;
 
+    // Konstruktor untuk data dummy
+    public Pengguna(int id, String nama, String nim, String email, String peran) {
+        this.id = id;
+        this.nama = nama;
+        this.nim = nim;
+        this.email = email;
+        this.peran = peran;
+    }
+
     public int getId() {
         return id;
     }

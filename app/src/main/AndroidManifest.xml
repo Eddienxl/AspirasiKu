@@ -27,6 +27,8 @@
         <activity android:name=".ui.profile.EditProfileActivity" />
         <activity android:name=".ui.profile.ChangePasswordActivity" />
         <activity android:name=".ui.notification.NotificationActivity" />
+        <activity android:name=".ui.admin.AdminActivity" />
+
     </application>
 
 </manifest>

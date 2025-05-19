@@ -17,9 +17,9 @@ public interface ApiService {
     @POST("api/auth/register")
     Call<AuthResponse> register(@Body RegisterRequest request);
 
-    // Get all posts
+    // Get all posts with filter
     @GET("api/postingan")
-    Call<List<Postingan>> getAllPosts();
+    Call<List<Postingan>> getAllPosts(@Query("sort") String sort, @Query("kategori") Integer kategori);
 
     // Get post detail
     @GET("api/postingan/{id}")
@@ -61,7 +61,23 @@ public interface ApiService {
     @POST("api/interaksi")
     Call<InteraksiResponse> sendVote(@Body InteraksiRequest request, @Header("Authorization") String token);
 
-    // Get interaction status (optional)
+    // Get interaction status
     @GET("api/interaksi/{id_postingan}")
     Call<InteraksiResponse> getInteractionStatus(@Path("id_postingan") int postId, @Header("Authorization") String token);
+
+    // Admin: Get all users
+    @GET("api/admin/pengguna")
+    Call<List<Pengguna>> getAllUsers(@Header("Authorization") String token);
+
+    // Admin: Delete user
+    @DELETE("api/admin/pengguna/{id}")
+    Call<Object> deleteUser(@Path("id") int userId, @Header("Authorization") String token);
+
+    // Admin: Get all posts
+    @GET("api/admin/postingan")
+    Call<List<Postingan>> getAllAdminPosts(@Header("Authorization") String token);
+
+    // Admin: Delete post
+    @DELETE("api/admin/postingan/{id}")
+    Call<Object> deletePost(@Path("id") int postId, @Header("Authorization") String token);
 }

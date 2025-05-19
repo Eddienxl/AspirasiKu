@@ -12,6 +12,18 @@ public class Postingan {
     private int upvotes;
     private int downvotes;
 
+    // Konstruktor untuk data dummy
+    public Postingan(int id, String judul, String konten, int id_kategori, String tipe, List<Komentar> komentar, int upvotes, int downvotes) {
+        this.id = id;
+        this.judul = judul;
+        this.konten = konten;
+        this.id_kategori = id_kategori;
+        this.tipe = tipe;
+        this.komentar = komentar;
+        this.upvotes = upvotes;
+        this.downvotes = downvotes;
+    }
+
     public int getId() { return id; }
     public String getJudul() { return judul; }
     public String getKonten() { return konten; }
