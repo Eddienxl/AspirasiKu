@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "728302687201",
+    "project_id": "aspirasikuproject",
+    "storage_bucket": "aspirasikuproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728302687201:android:75542e2b846156677c38a0",
+        "android_client_info": {
+          "package_name": "com.pmob.aspirasiku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwqKcHIVTOW7f1fzo8wvI_f4odAoNkStM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
