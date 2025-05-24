@@ -1,34 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    android:layout_marginVertical="4dp">
+    android:padding="12dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Indicator unread (bulatan kecil di kiri atas) -->
+    <View
+        android:id="@+id/viewUnreadIndicator"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/circle_blue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:visibility="visible" />
+
+    <!-- Judul notif -->
+    <TextView
+        android:id="@+id/txtNotificationTitle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:text="Judul Notifikasi"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/viewUnreadIndicator"
+        app:layout_constraintEnd_toStartOf="@id/txtNotificationTime"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp" />
 
-        <TextView
-            android:id="@+id/txtMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pesan notifikasi"
-            android:textSize="16sp" />
+    <!-- Waktu notif -->
+    <TextView
+        android:id="@+id/txtNotificationTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2 jam lalu"
+        android:textColor="#666"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="@id/txtNotificationTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp" />
 
-        <TextView
-            android:id="@+id/txtTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Waktu"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:layout_marginTop="4dp" />
+    <!-- Detail notif -->
+    <TextView
+        android:id="@+id/txtNotificationDesc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Deskripsi notifikasi yang lebih panjang bisa ditampilkan di sini."
+        android:textColor="#444"
+        android:textSize="14sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@id/txtNotificationTitle"
+        app:layout_constraintStart_toStartOf="@id/txtNotificationTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

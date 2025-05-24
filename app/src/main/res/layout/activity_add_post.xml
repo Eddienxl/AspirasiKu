@@ -4,65 +4,104 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#F9F9F9"
+    android:padding="34dp">
 
+    <!-- Judul Halaman -->
     <TextView
         android:id="@+id/txtTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ajukan Aspirasi/Pertanyaan"
-        android:textSize="20sp"
+        android:text="Ajukan Aspirasi/Pertanyaan!"
+        android:textSize="22sp"
         android:textStyle="bold"
+        android:textColor="#1B1B1B"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Input Judul -->
     <EditText
         android:id="@+id/inputJudul"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="Judul"
+        android:background="@drawable/edit_text_background"
+        android:padding="12dp"
+        android:textSize="14sp"
         android:inputType="text"
         app:layout_constraintTop_toBottomOf="@id/txtTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="24dp" />
 
+    <!-- Input Isi Aspirasi -->
     <EditText
         android:id="@+id/inputKonten"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Isi Aspirasi/Pertanyaan"
+        android:layout_height="150dp"
+        android:hint="Tulis aspirasi atau pertanyaan kamu di sini..."
+        android:background="@drawable/edit_text_background"
+        android:padding="12dp"
+        android:textSize="14sp"
+        android:gravity="top|start"
         android:inputType="textMultiLine"
-        android:minLines="4"
+        android:overScrollMode="always"
         app:layout_constraintTop_toBottomOf="@id/inputJudul"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
-    <Spinner
-        android:id="@+id/spinnerKategori"
+    <!-- Kategori dengan Spinner dan Ikon Panah -->
+    <FrameLayout
+        android:id="@+id/spinnerContainer"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_spinner"
         app:layout_constraintTop_toBottomOf="@id/inputKonten"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp">
 
+        <Spinner
+            android:id="@+id/spinnerKategori"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="12dp"
+            android:paddingEnd="48dp"
+            android:spinnerMode="dropdown"
+            android:dropDownVerticalOffset="48dp"
+            android:popupBackground="@android:color/white"
+            android:background="@android:color/transparent" />
+
+        <ImageView
+            android:id="@+id/spinnerArrow"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/arrow_drop_down"
+            android:contentDescription="Dropdown Arrow" />
+    </FrameLayout>
+
+    <!-- Tipe Pilihan -->
     <RadioGroup
         android:id="@+id/radioGroupTipe"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/spinnerKategori"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/spinnerContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="16dp">
 
         <RadioButton
             android:id="@+id/radioAspirasi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Aspirasi"
+            android:textColor="#1B1B1B"
+            android:buttonTint="#1E66F0"
             android:checked="true" />
 
         <RadioButton
@@ -70,16 +109,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Pertanyaan"
-            android:layout_marginStart="16dp" />
+            android:textColor="#1B1B1B"
+            android:buttonTint="#1E66F0"
+            android:layout_marginStart="32dp" />
     </RadioGroup>
 
+    <!-- Tombol Kirim -->
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="68dp"
         android:text="Ajukan"
+        android:textSize="20dp"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:backgroundTint="#1E66F0"
+        android:layout_marginTop="32dp"
+        android:elevation="4dp"
+        app:cornerRadius="12dp"
         app:layout_constraintTop_toBottomOf="@id/radioGroupTipe"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
