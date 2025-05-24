@@ -2,7 +2,7 @@ package com.pmob.aspirasiku.data.model;
 
 public class InteraksiRequest {
     private int id_postingan;
-    private String tipe; // "upvote" atau "downvote"
+    private String tipe;
 
     public InteraksiRequest(int id_postingan, String tipe) {
         this.id_postingan = id_postingan;

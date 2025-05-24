@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +29,6 @@ import com.pmob.aspirasiku.ui.post.AddPostActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -40,10 +40,12 @@ public class DashboardFragment extends Fragment {
     private RecyclerView recyclerView;
     private PostAdapter adapter;
     private Spinner spinnerSort, spinnerCategory;
+    private SearchView searchView;
     private ApiService apiService;
     private List<Kategori> kategoriList;
     private String selectedSort = "terbaru";
     private Integer selectedCategory = null;
+    private String searchQuery = null;
 
     public DashboardFragment() {}
 
@@ -56,9 +58,27 @@ public class DashboardFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerPosts);
         spinnerSort = view.findViewById(R.id.spinnerSort);
         spinnerCategory = view.findViewById(R.id.spinnerCategory);
+        searchView = view.findViewById(R.id.searchView);
         FloatingActionButton fabAddPost = view.findViewById(R.id.fabAddPost);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         apiService = RetrofitClient.getApiService();
+
+        // Setup SearchView
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchQuery = query.isEmpty() ? null : query;
+                fetchPosts();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchQuery = newText.isEmpty() ? null : newText;
+                fetchPosts();
+                return true;
+            }
+        });
 
         // Setup spinner untuk sorting
         ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getContext(),
@@ -174,7 +194,7 @@ public class DashboardFragment extends Fragment {
     }
 
     private void fetchPosts() {
-        apiService.getAllPosts(selectedSort, selectedCategory).enqueue(new Callback<List<Postingan>>() {
+        apiService.getAllPosts(selectedSort, selectedCategory, searchQuery).enqueue(new Callback<List<Postingan>>() {
             @Override
             public void onResponse(Call<List<Postingan>> call, Response<List<Postingan>> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -183,9 +203,9 @@ public class DashboardFragment extends Fragment {
                 } else {
                     // Data dummy jika API gagal
                     List<Postingan> dummyPosts = new ArrayList<>();
-                    dummyPosts.add(new Postingan(1, "Postingan 1", "Konten 1", 1, "publik", null, 5, 2));
-                    dummyPosts.add(new Postingan(2, "Postingan 2", "Konten 2", 2, "publik", null, 3, 1));
-                    dummyPosts.add(new Postingan(3, "Postingan 3", "Konten 3", 1, "publik", null, 7, 0));
+                    dummyPosts.add(new Postingan(1, "Tanya Akademik", "Apa syarat kelulusan?", 1, "publik", null, 5, 2));
+                    dummyPosts.add(new Postingan(2, "Fasilitas Rusak", "AC di kelas mati", 2, "publik", null, 3, 1));
+                    dummyPosts.add(new Postingan(3, "Jadwal Akademik", "Kapan ujian?", 1, "publik", null, 7, 0));
 
                     // Filter berdasarkan kategori
                     List<Postingan> filteredPosts = new ArrayList<>();
@@ -193,6 +213,18 @@ public class DashboardFragment extends Fragment {
                         if (selectedCategory == null || post.getId_kategori() == selectedCategory) {
                             filteredPosts.add(post);
                         }
+                    }
+
+                    // Filter berdasarkan pencarian
+                    if (searchQuery != null && !searchQuery.isEmpty()) {
+                        List<Postingan> searchResults = new ArrayList<>();
+                        String queryLower = searchQuery.toLowerCase();
+                        for (Postingan post : filteredPosts) {
+                            if (post.getJudul().toLowerCase().contains(queryLower)) {
+                                searchResults.add(post);
+                            }
+                        }
+                        filteredPosts = searchResults;
                     }
 
                     // Sort berdasarkan terbaru atau populer
@@ -211,9 +243,9 @@ public class DashboardFragment extends Fragment {
                 Log.e("DASHBOARD", "onFailure: " + t.getMessage());
                 // Data dummy jika API gagal
                 List<Postingan> dummyPosts = new ArrayList<>();
-                dummyPosts.add(new Postingan(1, "Postingan 1", "Konten 1", 1, "publik", null, 5, 2));
-                dummyPosts.add(new Postingan(2, "Postingan 2", "Konten 2", 2, "publik", null, 3, 1));
-                dummyPosts.add(new Postingan(3, "Postingan 3", "Konten 3", 1, "publik", null, 7, 0));
+                dummyPosts.add(new Postingan(1, "Tanya Akademik", "Apa syarat kelulusan?", 1, "publik", null, 5, 2));
+                dummyPosts.add(new Postingan(2, "Fasilitas Rusak", "AC di kelas mati", 2, "publik", null, 3, 1));
+                dummyPosts.add(new Postingan(3, "Jadwal Akademik", "Kapan ujian?", 1, "publik", null, 7, 0));
 
                 // Filter berdasarkan kategori
                 List<Postingan> filteredPosts = new ArrayList<>();
@@ -221,6 +253,18 @@ public class DashboardFragment extends Fragment {
                     if (selectedCategory == null || post.getId_kategori() == selectedCategory) {
                         filteredPosts.add(post);
                     }
+                }
+
+                // Filter berdasarkan pencarian
+                if (searchQuery != null && !searchQuery.isEmpty()) {
+                    List<Postingan> searchResults = new ArrayList<>();
+                    String queryLower = searchQuery.toLowerCase();
+                    for (Postingan post : filteredPosts) {
+                        if (post.getJudul().toLowerCase().contains(queryLower)) {
+                            searchResults.add(post);
+                        }
+                    }
+                    filteredPosts = searchResults;
                 }
 
                 // Sort berdasarkan terbaru atau populer

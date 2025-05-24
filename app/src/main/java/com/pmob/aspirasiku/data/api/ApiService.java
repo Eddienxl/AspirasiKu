@@ -17,9 +17,13 @@ public interface ApiService {
     @POST("api/auth/register")
     Call<AuthResponse> register(@Body RegisterRequest request);
 
-    // Get all posts with filter
+    // Get all posts with filter and search
     @GET("api/postingan")
-    Call<List<Postingan>> getAllPosts(@Query("sort") String sort, @Query("kategori") Integer kategori);
+    Call<List<Postingan>> getAllPosts(
+            @Query("sort") String sort,
+            @Query("kategori") Integer kategori,
+            @Query("search") String search
+    );
 
     // Get post detail
     @GET("api/postingan/{id}")
@@ -80,4 +84,8 @@ public interface ApiService {
     // Admin: Delete post
     @DELETE("api/admin/postingan/{id}")
     Call<Object> deletePost(@Path("id") int postId, @Header("Authorization") String token);
+
+    // Send FCM token
+    @POST("api/fcm-token")
+    Call<Object> sendFcmToken(@Body FcmTokenRequest request, @Header("Authorization") String token);
 }
