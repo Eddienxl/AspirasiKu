@@ -33,9 +33,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailInput = findViewById(R.id.emailInput);
-        passwordInput = findViewById(R.id.passwordInput);
-        btnLogin = findViewById(R.id.btnLogin);
+        emailInput = findViewById(R.id.emailEditText);
+        passwordInput = findViewById(R.id.passwordEditText);
+        btnLogin = findViewById(R.id.loginButton);
         apiService = RetrofitClient.getApiService();
         tokenManager = new TokenManager(this);
 

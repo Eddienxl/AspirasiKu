@@ -12,8 +12,12 @@ constraintlayout = "2.2.1"
 materialVersion = "1.11.0"
 recyclerview = "1.4.0"
 retrofit = "2.9.0"
+<<<<<<< HEAD
+navigationFragment = "2.9.0"
+=======
 googleGmsGoogleServices = "4.4.2"
 firebaseMessaging = "24.1.1"
+>>>>>>> 6217860418240709371cb44dea5bc297a3b11fb3
 
 [libraries]
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -30,7 +34,11 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 material-v1110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+<<<<<<< HEAD
+navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
+=======
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+>>>>>>> 6217860418240709371cb44dea5bc297a3b11fb3
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

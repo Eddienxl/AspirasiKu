@@ -1,5 +1,6 @@
 package com.pmob.aspirasiku.ui.main;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,10 +58,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
+<<<<<<< HEAD
+        getMenuInflater().inflate(R.layout.menu_profile, menu);
+        menu.findItem(R.id.action_admin).setVisible(isAdmin); // Hanya tampilkan untuk admin
+=======
         getMenuInflater().inflate(R.menu.menu_profile, menu);
         menu.findItem(R.id.action_admin).setVisible(isAdmin); // Hanya tampilkan untuk pengelola
+>>>>>>> 6217860418240709371cb44dea5bc297a3b11fb3
         return true;
     }
 
