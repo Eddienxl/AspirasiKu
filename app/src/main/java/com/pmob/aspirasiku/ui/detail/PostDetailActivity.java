@@ -21,6 +21,7 @@ import com.pmob.aspirasiku.data.model.Komentar;
 import com.pmob.aspirasiku.data.model.Postingan;
 import com.pmob.aspirasiku.utils.TokenManager;
 
+import java.util.ArrayList; // Impor jika List Komentar dari API bisa null
 import java.util.List;
 
 import retrofit2.Call;
@@ -65,12 +66,34 @@ public class PostDetailActivity extends AppCompatActivity {
             finish();
         }
 
-        btnUpvote.setOnClickListener(v -> sendVote("upvote"));
-        btnDownvote.setOnClickListener(v -> sendVote("downvote"));
-        btnSubmitComment.setOnClickListener(v -> submitComment());
+        btnUpvote.setOnClickListener(v -> {
+            if (tokenManager.getToken() == null || tokenManager.getToken().isEmpty()) {
+                Toast.makeText(this, "Anda harus login untuk vote", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            sendVote("upvote");
+        });
+        btnDownvote.setOnClickListener(v -> {
+            if (tokenManager.getToken() == null || tokenManager.getToken().isEmpty()) {
+                Toast.makeText(this, "Anda harus login untuk vote", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            sendVote("downvote");
+        });
+        btnSubmitComment.setOnClickListener(v -> {
+            if (tokenManager.getToken() == null || tokenManager.getToken().isEmpty()) {
+                Toast.makeText(this, "Anda harus login untuk berkomentar", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            submitComment();
+        });
     }
 
     private void fetchPostDetail() {
+        // Cek jika token diperlukan untuk mengambil detail postingan
+        // String token = tokenManager.getToken();
+        // String authHeader = (token != null && !token.isEmpty()) ? "Bearer " + token : null;
+        // Jika API getPostDetail tidak butuh token, panggil seperti biasa:
         apiService.getPostDetail(postId).enqueue(new Callback<Postingan>() {
             @Override
             public void onResponse(Call<Postingan> call, Response<Postingan> response) {
@@ -78,20 +101,26 @@ public class PostDetailActivity extends AppCompatActivity {
                     Postingan post = response.body();
                     txtTitle.setText(post.getJudul());
                     txtContent.setText(post.getKonten());
-                    updateVoteCounts(post.getUpvotes(), post.getDownvotes()); // Asumsi field ada di Postingan
-                    if (post.getKomentar() != null) {
-                        commentAdapter = new CommentAdapter(post.getKomentar(), PostDetailActivity.this);
+                    updateVoteCounts(post.getUpvotes(), post.getDownvotes()); // Sekarang seharusnya OK
+
+                    List<Komentar> komentarList = post.getKomentar(); // Sekarang seharusnya OK
+                    if (komentarList != null) {
+                        commentAdapter = new CommentAdapter(komentarList, PostDetailActivity.this);
+                        recyclerComments.setAdapter(commentAdapter);
+                    } else {
+                        // Handle jika daftar komentar null, misalnya dengan list kosong
+                        commentAdapter = new CommentAdapter(new ArrayList<>(), PostDetailActivity.this);
                         recyclerComments.setAdapter(commentAdapter);
                     }
                 } else {
-                    Toast.makeText(PostDetailActivity.this, "Gagal memuat detail", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostDetailActivity.this, "Gagal memuat detail: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Postingan> call, Throwable t) {
-                Log.e("POST_DETAIL", "onFailure: " + t.getMessage());
-                Toast.makeText(PostDetailActivity.this, "Error koneksi", Toast.LENGTH_SHORT).show();
+                Log.e("POST_DETAIL", "Fetch Detail onFailure: " + t.getMessage());
+                Toast.makeText(PostDetailActivity.this, "Error koneksi saat memuat detail", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -104,16 +133,23 @@ public class PostDetailActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     InteraksiResponse result = response.body();
                     updateVoteCounts(result.getUpvotes(), result.getDownvotes());
-                    Toast.makeText(PostDetailActivity.this, "Vote berhasil", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(PostDetailActivity.this, "Vote berhasil", Toast.LENGTH_SHORT).show(); // Mungkin tidak perlu jika UI langsung update
                 } else {
-                    Toast.makeText(PostDetailActivity.this, "Gagal mengirim vote", Toast.LENGTH_SHORT).show();
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
+                        Log.e("POST_DETAIL", "Send Vote Gagal: " + response.code() + " - " + errorBody);
+                        Toast.makeText(PostDetailActivity.this, "Gagal mengirim vote: " + response.code(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.e("POST_DETAIL", "Error parsing error body vote", e);
+                        Toast.makeText(PostDetailActivity.this, "Gagal mengirim vote: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<InteraksiResponse> call, Throwable t) {
-                Log.e("POST_DETAIL", "onFailure: " + t.getMessage());
-                Toast.makeText(PostDetailActivity.this, "Error koneksi", Toast.LENGTH_SHORT).show();
+                Log.e("POST_DETAIL", "Send Vote onFailure: " + t.getMessage());
+                Toast.makeText(PostDetailActivity.this, "Error koneksi saat mengirim vote", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -125,28 +161,39 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private void submitComment() {
         String content = inputComment.getText().toString().trim();
-        if (!content.isEmpty()) {
-            Komentar komentar = new Komentar(postId, content);
-            apiService.createComment(komentar, "Bearer " + tokenManager.getToken()).enqueue(new Callback<Object>() {
-                @Override
-                public void onResponse(Call<Object> call, Response<Object> response) {
-                    if (response.isSuccessful()) {
-                        inputComment.setText("");
-                        fetchPostDetail(); // Refresh komentar
-                        Toast.makeText(PostDetailActivity.this, "Komentar berhasil dikirim", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(PostDetailActivity.this, "Gagal mengirim komentar", Toast.LENGTH_SHORT).show();
+        if (content.isEmpty()) {
+            inputComment.setError("Komentar tidak boleh kosong");
+            return;
+        }
+
+        // Asumsi Komentar.java memiliki constructor (int postId, String content)
+        // atau Anda membuat model request khusus untuk komentar.
+        Komentar komentarRequest = new Komentar(postId, content);
+
+        apiService.createComment(komentarRequest, "Bearer " + tokenManager.getToken()).enqueue(new Callback<Object>() { // Ganti Object dengan response model yang sesuai jika ada
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()) {
+                    inputComment.setText("");
+                    fetchPostDetail(); // Refresh komentar dan detail postingan
+                    Toast.makeText(PostDetailActivity.this, "Komentar berhasil dikirim", Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
+                        Log.e("POST_DETAIL", "Submit Comment Gagal: " + response.code() + " - " + errorBody);
+                        Toast.makeText(PostDetailActivity.this, "Gagal mengirim komentar: " + response.code(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.e("POST_DETAIL", "Error parsing error body comment", e);
+                        Toast.makeText(PostDetailActivity.this, "Gagal mengirim komentar: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
 
-                @Override
-                public void onFailure(Call<Object> call, Throwable t) {
-                    Log.e("POST_DETAIL", "onFailure: " + t.getMessage());
-                    Toast.makeText(PostDetailActivity.this, "Error koneksi", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            inputComment.setError("Komentar tidak boleh kosong");
-        }
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Log.e("POST_DETAIL", "Submit Comment onFailure: " + t.getMessage());
+                Toast.makeText(PostDetailActivity.this, "Error koneksi saat mengirim komentar", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

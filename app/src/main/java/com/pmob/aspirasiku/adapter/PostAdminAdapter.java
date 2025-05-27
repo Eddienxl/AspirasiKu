@@ -12,12 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.pmob.aspirasiku.R;
 import com.pmob.aspirasiku.data.model.Postingan;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostAdminAdapter extends RecyclerView.Adapter<PostAdminAdapter.ViewHolder> {
 
     private final List<Postingan> postList;
     private final OnDeleteClickListener onDeleteClickListener;
+
+    public void updateData(ArrayList<Postingan> postingans) {
+
+    }
 
     public interface OnDeleteClickListener {
         void onDeleteClick(int postId);

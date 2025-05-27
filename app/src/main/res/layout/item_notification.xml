@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:padding="12dp">
 
-    <!-- Indicator unread (bulatan kecil di kiri atas) -->
     <View
         android:id="@+id/viewUnreadIndicator"
         android:layout_width="10dp"
@@ -18,7 +17,6 @@
         android:layout_marginStart="8dp"
         android:visibility="visible" />
 
-    <!-- Judul notif -->
     <TextView
         android:id="@+id/txtNotificationTitle"
         android:layout_width="0dp"
@@ -29,14 +27,11 @@
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/viewUnreadIndicator"
-        app:layout_constraintEnd_toStartOf="@id/txtNotificationTime"
-        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/txtTime" android:layout_marginStart="8dp"
         android:layout_marginTop="4dp" />
 
-    <!-- Waktu notif -->
     <TextView
-        android:id="@+id/txtNotificationTime"
-        android:layout_width="wrap_content"
+        android:id="@+id/txtTime" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2 jam lalu"
         android:textColor="#666"
@@ -45,10 +40,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="8dp" />
 
-    <!-- Detail notif -->
     <TextView
-        android:id="@+id/txtNotificationDesc"
-        android:layout_width="0dp"
+        android:id="@+id/txtMessage" android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Deskripsi notifikasi yang lebih panjang bisa ditampilkan di sini."
         android:textColor="#444"

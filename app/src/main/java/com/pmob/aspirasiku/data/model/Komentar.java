@@ -8,7 +8,7 @@ public class Komentar {
     private boolean anonim;
     private String created_at;
 
-    public Komentar(int id, int id_pengguna, int id_postingan, String konten, boolean anonim, String created_at) {
+    public Komentar(int id, String konten) {
         this.id = id;
         this.id_pengguna = id_pengguna;
         this.id_postingan = id_postingan;
