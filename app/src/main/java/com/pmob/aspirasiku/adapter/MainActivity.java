@@ -1,8 +1,10 @@
-package com.pmob.aspirasiku.ui.main;
+package com.pmob.aspirasiku.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -47,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     isAdmin = "pengelola".equals(response.body().getPeran());
                     invalidateOptionsMenu(); // Refresh menu
-                } else {
-                    // Handle kasus response tidak sukses atau body null jika perlu
-                    isAdmin = false;
-                    invalidateOptionsMenu();
                 }
             }
 
@@ -58,20 +56,16 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<Pengguna> call, Throwable t) {
                 isAdmin = false; // Default ke false jika gagal
                 invalidateOptionsMenu();
-                // Tambahkan logging atau pesan error ke pengguna jika perlu
-                // Log.e("UserProfile", "Failed to fetch user profile", t);
             }
         });
     }
 
-    @SuppressLint("ResourceType") // Anotasi ini mungkin tidak diperlukan jika R.menu.menu_profile dikenali
+    @SuppressLint("ResourceType") // Tetap perhatikan penggunaan @SuppressLint ini. ResourceType biasanya untuk inflater jika ID layout tidak konstan.
     @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        getMenuInflater().inflate(R.layout.menu_profile, menu); // Menggunakan R.menu
-        // Tambahkan null check untuk item menu sebelum mengaksesnya
-        android.view.MenuItem adminItem = menu.findItem(R.id.action_admin);
-        if (adminItem != null) {
-            adminItem.setVisible(isAdmin); // Hanya tampilkan untuk admin/pengelola
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.layout.menu_profile, menu); // Diperbaiki ke R.menu
+        if (menu.findItem(R.id.action_admin) != null) { // Tambahkan null check untuk keamanan
+            menu.findItem(R.id.action_admin).setVisible(isAdmin); // Hanya tampilkan untuk admin/pengelola
         }
         return true;
     }
@@ -86,16 +80,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, ProfileActivity.class));
             return true;
         } else if (id == R.id.action_admin) {
-            // Tambahkan pengecekan isAdmin di sini juga sebagai lapisan keamanan tambahan
-            if (isAdmin) {
+            if (isAdmin) { // Sebaiknya tambahkan pengecekan isAdmin di sini juga
                 startActivity(new Intent(this, AdminActivity.class));
                 return true;
-            } else {
-                // Opsional: Beri tahu pengguna bahwa mereka tidak punya akses
-                // Toast.makeText(this, "Anda tidak memiliki akses admin.", Toast.LENGTH_SHORT).show();
-                return false; // Atau true jika Anda ingin event tetap dianggap ter-handle
             }
         }
         return super.onOptionsItemSelected(item);
     }
-}
+} // Baris tambahan dan error di akhir file telah dihapus

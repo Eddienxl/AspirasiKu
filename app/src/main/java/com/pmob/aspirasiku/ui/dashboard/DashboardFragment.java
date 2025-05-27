@@ -1,6 +1,7 @@
 package com.pmob.aspirasiku.ui.dashboard;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +32,8 @@ import com.pmob.aspirasiku.ui.post.AddPostActivity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,7 +46,7 @@ public class DashboardFragment extends Fragment {
     private Spinner spinnerSort, spinnerCategory;
     private SearchView searchView;
     private ApiService apiService;
-    private List<Kategori> kategoriList;
+    private List<Kategori> kategoriList = new ArrayList<>(); // Inisialisasi untuk menghindari NullPointerException
     private String selectedSort = "terbaru";
     private Integer selectedCategory = null;
     private String searchQuery = null;
@@ -60,6 +64,11 @@ public class DashboardFragment extends Fragment {
         spinnerCategory = view.findViewById(R.id.spinnerCategory);
         searchView = view.findViewById(R.id.searchView);
         FloatingActionButton fabAddPost = view.findViewById(R.id.fabAddPost);
+
+        if (getContext() == null) { // Tambahan: Safety check untuk getContext()
+            return view; // atau handle error
+        }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         apiService = RetrofitClient.getApiService();
 
@@ -69,11 +78,14 @@ public class DashboardFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 searchQuery = query.isEmpty() ? null : query;
                 fetchPosts();
+                searchView.clearFocus(); // Opsional: Sembunyikan keyboard setelah submit
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                // Mengubah agar fetchPosts dipanggil hanya jika ada perubahan signifikan atau setelah delay
+                // Untuk sekarang, kita biarkan seperti ini, tapi pertimbangkan debounce untuk performa
                 searchQuery = newText.isEmpty() ? null : newText;
                 fetchPosts();
                 return true;
@@ -96,186 +108,164 @@ public class DashboardFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Setup spinner untuk kategori
-        fetchCategories();
+        fetchCategories(); // Setup spinner untuk kategori akan dipanggil di sini
 
         fabAddPost.setOnClickListener(v -> {
-            Intent intent = new Intent(getContext(), AddPostActivity.class);
-            startActivity(intent);
+            if (getContext() != null) {
+                Intent intent = new Intent(getContext(), AddPostActivity.class);
+                startActivity(intent);
+            }
         });
 
-        fetchPosts();
+        fetchPosts(); // Panggilan awal untuk memuat postingan
 
         return view;
     }
 
     private void fetchCategories() {
+        if (getContext() == null || apiService == null) return; // Safety check
+
         apiService.getKategori().enqueue(new Callback<List<Kategori>>() {
             @Override
             public void onResponse(Call<List<Kategori>> call, Response<List<Kategori>> response) {
+                if (!isAdded() || getContext() == null) return; // Cek Fragment masih ter-attach
+
                 if (response.isSuccessful() && response.body() != null) {
                     kategoriList = response.body();
-                    List<String> kategoriNames = new ArrayList<>();
-                    kategoriNames.add("Semua Kategori");
-                    for (Kategori kategori : kategoriList) {
-                        kategoriNames.add(kategori.getNama());
-                    }
-                    ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
-                            android.R.layout.simple_spinner_item, kategoriNames);
-                    categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerCategory.setAdapter(categoryAdapter);
-                    spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            selectedCategory = position == 0 ? null : kategoriList.get(position - 1).getId();
-                            fetchPosts();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {}
-                    });
+                    setupCategorySpinner(kategoriList);
                 } else {
                     // Data dummy untuk kategori jika API gagal
                     kategoriList = new ArrayList<>();
                     kategoriList.add(new Kategori(1, "Akademik"));
                     kategoriList.add(new Kategori(2, "Fasilitas"));
-                    List<String> kategoriNames = new ArrayList<>();
-                    kategoriNames.add("Semua Kategori");
-                    for (Kategori kategori : kategoriList) {
-                        kategoriNames.add(kategori.getNama());
-                    }
-                    ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
-                            android.R.layout.simple_spinner_item, kategoriNames);
-                    categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerCategory.setAdapter(categoryAdapter);
-                    spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            selectedCategory = position == 0 ? null : kategoriList.get(position - 1).getId();
-                            fetchPosts();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {}
-                    });
+                    setupCategorySpinner(kategoriList);
                     Toast.makeText(getContext(), "Menggunakan data dummy untuk kategori", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Kategori>> call, Throwable t) {
-                Log.e("DASHBOARD", "onFailure: " + t.getMessage());
+                if (!isAdded() || getContext() == null) return; // Cek Fragment masih ter-attach
+
+                Log.e("DASHBOARD", "Fetch Categories onFailure: " + t.getMessage());
                 // Data dummy untuk kategori jika API gagal
                 kategoriList = new ArrayList<>();
                 kategoriList.add(new Kategori(1, "Akademik"));
                 kategoriList.add(new Kategori(2, "Fasilitas"));
-                List<String> kategoriNames = new ArrayList<>();
-                kategoriNames.add("Semua Kategori");
-                for (Kategori kategori : kategoriList) {
-                    kategoriNames.add(kategori.getNama());
-                }
-                ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
-                        android.R.layout.simple_spinner_item, kategoriNames);
-                categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerCategory.setAdapter(categoryAdapter);
-                spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        selectedCategory = position == 0 ? null : kategoriList.get(position - 1).getId();
-                        fetchPosts();
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {}
-                });
-                Toast.makeText(getContext(), "Menggunakan data dummy untuk kategori", Toast.LENGTH_SHORT).show();
+                setupCategorySpinner(kategoriList);
+                Toast.makeText(getContext(), "Gagal memuat kategori, menggunakan data dummy", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void setupCategorySpinner(List<Kategori> categories) {
+        if (getContext() == null || spinnerCategory == null) return; // Safety check
+
+        List<String> kategoriNames = new ArrayList<>();
+        kategoriNames.add("Semua Kategori"); // Opsi default
+        for (Kategori kategori : categories) {
+            kategoriNames.add(kategori.getNama());
+        }
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, kategoriNames);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategory.setAdapter(categoryAdapter);
+        spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    selectedCategory = null; // "Semua Kategori" dipilih
+                } else {
+                    // Pastikan kategoriList tidak kosong dan position valid
+                    if (kategoriList != null && !kategoriList.isEmpty() && (position - 1) < kategoriList.size()) {
+                        selectedCategory = kategoriList.get(position - 1).getId();
+                    } else {
+                        selectedCategory = null; // Fallback jika ada masalah
+                    }
+                }
+                fetchPosts();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
     private void fetchPosts() {
+        if (getContext() == null || apiService == null) return; // Safety check
+
         apiService.getAllPosts(selectedSort, selectedCategory, searchQuery).enqueue(new Callback<List<Postingan>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call<List<Postingan>> call, Response<List<Postingan>> response) {
+                if (!isAdded() || getContext() == null) return; // Cek Fragment masih ter-attach
+
                 if (response.isSuccessful() && response.body() != null) {
-                    adapter = new PostAdapter(response.body(), getContext());
+                    List<Postingan> posts = response.body();
+                    // Lakukan filtering dan sorting di sisi client jika API tidak mendukungnya secara penuh
+                    // atau jika Anda ingin konsistensi antara data live dan dummy.
+                    // Untuk sekarang, kita asumsikan API sudah melakukan sort & filter
+                    adapter = new PostAdapter(posts, getContext());
                     recyclerView.setAdapter(adapter);
                 } else {
-                    // Data dummy jika API gagal
-                    List<Postingan> dummyPosts = new ArrayList<>();
-                    dummyPosts.add(new Postingan(1, "Tanya Akademik", "Apa syarat kelulusan?", 1, "publik", null, 5, 2));
-                    dummyPosts.add(new Postingan(2, "Fasilitas Rusak", "AC di kelas mati", 2, "publik", null, 3, 1));
-                    dummyPosts.add(new Postingan(3, "Jadwal Akademik", "Kapan ujian?", 1, "publik", null, 7, 0));
-
-                    // Filter berdasarkan kategori
-                    List<Postingan> filteredPosts = new ArrayList<>();
-                    for (Postingan post : dummyPosts) {
-                        if (selectedCategory == null || post.getId_kategori() == selectedCategory) {
-                            filteredPosts.add(post);
-                        }
-                    }
-
-                    // Filter berdasarkan pencarian
-                    if (searchQuery != null && !searchQuery.isEmpty()) {
-                        List<Postingan> searchResults = new ArrayList<>();
-                        String queryLower = searchQuery.toLowerCase();
-                        for (Postingan post : filteredPosts) {
-                            if (post.getJudul().toLowerCase().contains(queryLower)) {
-                                searchResults.add(post);
-                            }
-                        }
-                        filteredPosts = searchResults;
-                    }
-
-                    // Sort berdasarkan terbaru atau populer
-                    if ("populer".equals(selectedSort)) {
-                        Collections.sort(filteredPosts, (p1, p2) -> p2.getUpvotes() - p1.getUpvotes());
-                    }
-
-                    adapter = new PostAdapter(filteredPosts, getContext());
-                    recyclerView.setAdapter(adapter);
-                    Toast.makeText(getContext(), "Menggunakan data dummy untuk postingan", Toast.LENGTH_SHORT).show();
+                    loadDummyPosts("Gagal memuat postingan dari server.");
                 }
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onFailure(Call<List<Postingan>> call, Throwable t) {
-                Log.e("DASHBOARD", "onFailure: " + t.getMessage());
-                // Data dummy jika API gagal
-                List<Postingan> dummyPosts = new ArrayList<>();
-                dummyPosts.add(new Postingan(1, "Tanya Akademik", "Apa syarat kelulusan?", 1, "publik", null, 5, 2));
-                dummyPosts.add(new Postingan(2, "Fasilitas Rusak", "AC di kelas mati", 2, "publik", null, 3, 1));
-                dummyPosts.add(new Postingan(3, "Jadwal Akademik", "Kapan ujian?", 1, "publik", null, 7, 0));
-
-                // Filter berdasarkan kategori
-                List<Postingan> filteredPosts = new ArrayList<>();
-                for (Postingan post : dummyPosts) {
-                    if (selectedCategory == null || post.getId_kategori() == selectedCategory) {
-                        filteredPosts.add(post);
-                    }
-                }
-
-                // Filter berdasarkan pencarian
-                if (searchQuery != null && !searchQuery.isEmpty()) {
-                    List<Postingan> searchResults = new ArrayList<>();
-                    String queryLower = searchQuery.toLowerCase();
-                    for (Postingan post : filteredPosts) {
-                        if (post.getJudul().toLowerCase().contains(queryLower)) {
-                            searchResults.add(post);
-                        }
-                    }
-                    filteredPosts = searchResults;
-                }
-
-                // Sort berdasarkan terbaru atau populer
-                if ("populer".equals(selectedSort)) {
-                    Collections.sort(filteredPosts, (p1, p2) -> p2.getUpvotes() - p1.getUpvotes());
-                }
-
-                adapter = new PostAdapter(filteredPosts, getContext());
-                recyclerView.setAdapter(adapter);
-                Toast.makeText(getContext(), "Menggunakan data dummy untuk postingan", Toast.LENGTH_SHORT).show();
+                if (!isAdded() || getContext() == null) return; // Cek Fragment masih ter-attach
+                Log.e("DASHBOARD", "Fetch Posts onFailure: " + t.getMessage());
+                loadDummyPosts(t.getMessage());
             }
         });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void loadDummyPosts(String reason) {
+        if (getContext() == null) return;
+        Log.d("DASHBOARD", "Memuat data dummy postingan karena: " + reason);
+
+        List<Postingan> dummyPosts = new ArrayList<>();
+        // PERBAIKAN: Hapus argumen integer terakhir
+        dummyPosts.add(new Postingan(1, "Tanya Akademik", "Apa syarat kelulusan?", 1, "publik", null, 5));
+        dummyPosts.add(new Postingan(2, "Fasilitas Rusak", "AC di kelas mati", 2, "publik", null, 3));
+        dummyPosts.add(new Postingan(3, "Jadwal Akademik", "Kapan ujian?", 1, "publik", null, 7));
+
+        // Filter berdasarkan kategori
+        List<Postingan> filteredPosts = new ArrayList<>();
+        if (selectedCategory == null) {
+            filteredPosts.addAll(dummyPosts);
+        } else {
+            for (Postingan post : dummyPosts) {
+                if (post.getId_kategori() == selectedCategory) {
+                    filteredPosts.add(post);
+                }
+            }
+        }
+
+        // Filter berdasarkan pencarian
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            String queryLower = searchQuery.toLowerCase();
+            // Menggunakan stream untuk filter, atau loop biasa juga bisa
+            filteredPosts = filteredPosts.stream()
+                    .filter(post -> post.getJudul().toLowerCase().contains(queryLower))
+                    .collect(Collectors.toList());
+        }
+
+        // Sort berdasarkan terbaru atau populer
+        if ("populer".equals(selectedSort)) {
+            // Asumsi getUpvotes() ada di model Postingan
+            Collections.sort(filteredPosts, (p1, p2) -> Integer.compare(p2.getUpvotes(), p1.getUpvotes()));
+        } else {
+            // Untuk "terbaru", jika ada timestamp, sort berdasarkan itu.
+            // Jika tidak, urutan dummy saat ini mungkin sudah cukup.
+            // Collections.sort(filteredPosts, (p1, p2) -> Integer.compare(p2.getId(), p1.getId())); // Contoh sort by ID desc
+        }
+
+        adapter = new PostAdapter(filteredPosts, getContext());
+        recyclerView.setAdapter(adapter);
+        Toast.makeText(getContext(), "Menggunakan data dummy untuk postingan", Toast.LENGTH_SHORT).show();
     }
 }

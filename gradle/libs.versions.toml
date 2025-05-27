@@ -12,12 +12,9 @@ constraintlayout = "2.2.1"
 materialVersion = "1.11.0"
 recyclerview = "1.4.0"
 retrofit = "2.9.0"
-<<<<<<< HEAD
-navigationFragment = "2.9.0"
-=======
 googleGmsGoogleServices = "4.4.2"
 firebaseMessaging = "24.1.1"
->>>>>>> 6217860418240709371cb44dea5bc297a3b11fb3
+navigation = "2.7.7" # TAMBAHKAN INI (atau versi terbaru)
 
 [libraries]
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -34,13 +31,10 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 material-v1110 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-<<<<<<< HEAD
-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
-=======
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
->>>>>>> 6217860418240709371cb44dea5bc297a3b11fb3
+navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" } # TAMBAHKAN INI
+navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" } # TAMBAHKAN INI
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
-
