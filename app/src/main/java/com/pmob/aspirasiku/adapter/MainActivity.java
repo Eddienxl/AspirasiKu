@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ResourceType") // Tetap perhatikan penggunaan @SuppressLint ini. ResourceType biasanya untuk inflater jika ID layout tidak konstan.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.layout.menu_profile, menu); // Diperbaiki ke R.menu
+        getMenuInflater().inflate(R.menu.menu_profile, menu); // Diperbaiki ke R.menu
         if (menu.findItem(R.id.action_admin) != null) { // Tambahkan null check untuk keamanan
             menu.findItem(R.id.action_admin).setVisible(isAdmin); // Hanya tampilkan untuk admin/pengelola
         }
