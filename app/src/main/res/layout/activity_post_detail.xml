@@ -7,7 +7,6 @@
     android:background="@android:color/white"
     android:padding="16dp">
 
-    <!-- Judul Postingan -->
     <TextView
         android:id="@+id/txtTitle"
         android:layout_width="0dp"
@@ -15,106 +14,131 @@
         android:text="Judul Postingan"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:padding="8dp"
+        android:textColor="@android:color/black"
+        android:paddingBottom="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Konten Postingan -->
+    <TextView
+        android:id="@+id/txtPostedByLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Diposting oleh:"
+        android:textSize="14sp"
+        android:textColor="#888888"
+        app:layout_constraintTop_toBottomOf="@id/txtTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="2dp" /> <TextView
+    android:id="@+id/txtUserName"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="Nama Pengguna"
+    android:textSize="14sp"
+    android:textStyle="bold" android:textColor="@android:color/black" app:layout_constraintTop_toTopOf="@id/txtPostedByLabel" app:layout_constraintStart_toEndOf="@id/txtPostedByLabel" app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginStart="4dp" /> <View
+    android:id="@+id/divider"
+    android:layout_width="0dp"
+    android:layout_height="1dp"
+    android:background="#EEEEEE"
+    app:layout_constraintTop_toBottomOf="@id/txtUserName" app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="8dp" />
+
     <TextView
         android:id="@+id/txtContent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Konten postingan di sini..."
         android:textSize="16sp"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/txtTitle"
+        android:textColor="#333333"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/divider"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Section Komentar -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerComments"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:maxHeight="200dp"
-        app:layout_constraintTop_toBottomOf="@id/txtContent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+    android:maxHeight="200dp"
+    app:layout_constraintTop_toBottomOf="@id/txtContent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="16dp" />
 
-    <!-- Section Voting -->
     <LinearLayout
         android:id="@+id/voteSection"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@android:color/darker_gray"
+        android:gravity="center_vertical"
+        android:background="@android:color/white"
         android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/recyclerComments"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp">
 
-        <Button
+        <ImageButton
             android:id="@+id/btnUpvote"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Upvote"
-            android:backgroundTint="@color/teal_200"
-            android:layout_weight="1"
-            android:padding="8dp" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_upvote"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Tombol Upvote"
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/txtUpvotes"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
             android:textSize="16sp"
+            android:textColor="@android:color/black"
             android:gravity="center"
-            android:layout_weight="1"
-            android:padding="8dp" />
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="16dp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnDownvote"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Downvote"
-            android:backgroundTint="@color/teal_700"
-            android:layout_weight="1"
-            android:padding="8dp" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_downvote"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Tombol Downvote"
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/txtDownvotes"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0"
             android:textSize="16sp"
+            android:textColor="@android:color/black"
             android:gravity="center"
-            android:layout_weight="1"
-            android:padding="8dp" />
+            android:layout_marginStart="4dp" />
 
     </LinearLayout>
 
-    <!-- Input Komentar -->
     <EditText
         android:id="@+id/inputComment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Tambah komentar..."
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:inputType="textMultiLine"
         android:minLines="2"
-        android:padding="8dp"
+        android:maxLines="5"
+        android:gravity="top"
+        android:padding="12dp"
         android:background="@drawable/edittext_border"
         app:layout_constraintTop_toBottomOf="@id/voteSection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
-    <!-- Tombol Kirim -->
     <Button
         android:id="@+id/btnSubmitComment"
         android:layout_width="0dp"
